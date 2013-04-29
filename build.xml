@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<project name="exewrapF" default="build.exe" basedir=".">
+  <property name="src.dir" value="src"/>
+  <property name="bin.dir" value="bin"/>
+  <property name="jar.name" value="exewrapF.jar"/>
+  <property name="exe.name" value="exewrapF.exe"/>
+  <property name="main.class" value="ExewrapFrontend"/>
+
+  <target name="all" depends="build.exe"/>
+
+  <!-- exeファイルの作成 -->
+  <target name="build.exe" depends="build.jar">
+    <exec executable="other/exewrap.exe" failonerror="true">
+      <arg line="-d exewrapのフロントエンド"/>
+      <arg line="-e SINGLE;NOLOG -g -j ${jar.name} -o ${exe.name} -t 1.6 -v 1.9.8.2"/>
+    </exec>
+  </target>
+
+  <!-- jarファイルの作成 -->
+  <target name="build.jar" depends="compile">
+    <jar jarfile="${jar.name}">
+      <fileset dir="${bin.dir}"/>
+      <fileset dir="./" includes="resource/"/>
+      <manifest>
+        <attribute name="Main-Class" value="${main.class}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!-- javaファイルのコンパイル -->
+  <target name="compile">
+    <mkdir dir="${bin.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${bin.dir}" encoding="utf-8" includeantruntime="false"/>
+  </target>
+
+  <!-- オブジェクトのクリーン -->
+  <target name="clean">
+    <delete file="${jar.name}"/>
+    <delete file="${exe.name}"/>
+    <delete>
+      <fileset dir="${bin.dir}" includes="*.class"/>
+    </delete>
+  </target>
+  <target name="objclean">
+    <delete>
+      <fileset dir="${bin.dir}" includes="*.class"/>
+    </delete>
+  </target>
+</project>
