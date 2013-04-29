@@ -8,7 +8,7 @@ DISTDIR    = bin
 SRCVERSION = 1.7
 BINVERSION = 1.7
 
-JFLAGS     = -encoding $(ENCODE) -source $(SRCVERSION) -target $(BINVERSION)
+JFLAGS     = -sourcepath $(SRCDIR) -encoding $(ENCODE) -d $(DISTDIR) -source $(SRCVERSION) -target $(BINVERSION)
 EWFLAGS    = -d "exewrapのフロントエンド" -e "SINGLE;NOLOG" -g -j ${jar.name} -o ${exe.name} -t 1.6 -v 1.9.8.2
 
 MAIN_SRC   = $(SRCDIR)/exewrapFrontend.java
@@ -23,14 +23,16 @@ MFFILE     = other/MANIFEST.MF
 all : $(EXEFILE)
 
 $(EXEFILE) : $(JARFILE)
-	$(EXEWRAP) $(EWFLAGS) -j $< -o $@
+	$(EXEWRAP) $(EWFLAGS) -j $(JARFILE) -o $(EXEFILE)
 
 $(JARFILE) : $(DISTDIR)/$(MAIN_CLASS).class
-	$(JAR) cvmf $(MFFILE) $@ -C $(dir $<) . resource
+	$(JAR) cvmf $(MFFILE) $(JARFILE) -C $(DISTDIR) . resource
 
 $(DISTDIR)/$(MAIN_CLASS).class : $(SRCS)
-	@ls $(dir $@) >/dev/null 2>&1 || mkdir $(dir $@)
-	$(JAVAC) $(MAIN_SRC) $(JFLAGS) -sourcepath $(SRCDIR) -d $(dir $@)
+	@if [ ! -d $(dir $@) ];  \
+	  then mkdir $(dir $@);  \
+	fi
+	$(JAVAC) $(JFLAGS) $(MAIN_SRC)
 
 
 .PHONY : clean
